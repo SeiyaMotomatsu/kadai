@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>chatapp</title>
+</head>
+<body>
+    <div>
+        <ul>
+            <li class="imgs" data-img="0"><img src="img/chrome.png" width="100" alt=""> </li>
+            <li class="imgs" data-img="1"><img src="img/firefox.png" width="100" alt=""> </li>
+            <li class="imgs" data-img="2"><img src="img/ie.png" width="100" alt=""> </li>
+        </ul>
+        <div>
+            <input type="text" id="username">
+        </div>
+        <div>
+            <textarea name="" id="text" cols="30" rows="10"></textarea>
+            <button id="send">送信</button>
+        </div>
+
+        <div id="output"></div>
+    </div>
+
+
+    <!-- 以下JavaScript領域 -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <!-- 以下Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/5.4.0/firebase.js"></script>
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyDRHBRqKN4EkvKqbWn1kOdBqGEnQfkbDpg",
+        authDomain: "chatapp-a1f98.firebaseapp.com",
+        databaseURL: "https://chatapp-a1f98.firebaseio.com",
+        projectId: "chatapp-a1f98",
+        storageBucket: "chatapp-a1f98.appspot.com",
+        messagingSenderId: "626766738904"
+      };
+      firebase.initializeApp(config);
+
+    //   メッセージ送受信準備
+
+      var newPostRef = firebase.database().ref()
+
+    //   アイコンを設定
+    var d = 0;
+    var img =['chrome.png','firefox.png','ie.png']
+    
+    $('.imgs').on('click',function(){
+      d = $(this).attr("data-img");
+
+    })
+
+    function name(){
+        var username = $('#username').val();
+        return username
+    }
+　　　　
+// 　　日時を取得する
+　　function ymd(){
+    var date= new Date();
+    var d = date.getMonth()+1 + "/" + date.getDate() + " "  + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+    console.log(d);
+    return d
+    }
+    ymd();
+
+ 
+//   送信ボタンクリックでメッセージ送信
+$('#send').on('click',function(){
+    newPostRef.push({
+        username:name(),
+        time: ymd(),
+        text: $('#text').val(),
+        icon: d
+        
+    });
+    $('#text').val("");
+});
+
+
+//  メッセージデータ受信
+// 　child_added:追加時
+
+newPostRef.on('child_added',function(data){
+     var k = data.key; //ユニークキー取得
+     var v = data.val();　//データ取得
+// 　　メッセージ表示
+　　　var str = '';
+     str += '<div id="' + k + '">';
+     str += '<img src="img/' + img[v.icon] + '"width="50">'
+     str += '<p>' + v.username + '</p>';
+     str += '<p>' + v.time + '</p>';
+     str += '<p>' + v.text + '</p>';
+     str += '</div>';
+     $('#output').append(str);
+
+});
+
+
+
+
+
+
+
+
+
+
+
+
+     </script>
+</body>
+</html>
